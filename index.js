@@ -3,11 +3,13 @@ const graphqlHttp = require("express-graphql");
 const { buildSchema } = require("graphql"); // takes template literal
 
 const app = express();
-app.use(express.json())
+app.use(express.json());
 
 // use graphqlHttp to build schema and root queries/mutations
-app.use("/graphql", graphqlHttp({
-  schema: buildSchema(`
+app.use(
+  "/graphql",
+  graphqlHttp({
+    schema: buildSchema(`
     type RootQuery {
       notebooks: [String!]!
     }
@@ -21,8 +23,18 @@ app.use("/graphql", graphqlHttp({
       mutation: RootMutation
     }
   `),
-  rootValue: {}, // points at resolvers
-  graphiql: true // provides an interface
-}))
+    rootValue: {
+      notebooks: () => {
+        // called when someone looks for notebooks
+        return ["SQL", "NodeJS", "MongoDB"];
+      },
+      createNotebook: args => {
+        const { name } = args;
+        return name;
+      }
+    },
+    graphiql: true // provides an interface
+  })
+);
 
-app.listen(5000)
+app.listen(5000);
