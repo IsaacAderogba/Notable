@@ -10,7 +10,13 @@ const notebookSchema = new Schema({
   createdAt: {
     type: Date, // up to us to convert
     required: true
-  }
+  },
+  authors: [
+    {
+      type: Schema.Types.ObjectId, // stores list of ids
+      ref: "User" // linked to event model
+    }
+  ]
 });
 
 module.exports = mongoose.model("Notebook", notebookSchema);

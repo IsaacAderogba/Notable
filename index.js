@@ -3,7 +3,10 @@ const express = require("express");
 const graphqlHttp = require("express-graphql");
 const mongoose = require("mongoose");
 const { buildSchema } = require("graphql"); // takes template literal
+
+
 const Notebook = require("./models/notebook");
+const User = require("./models/user")
 
 const app = express();
 app.use(express.json());
@@ -19,17 +22,33 @@ app.use(
       createdAt: String!
     }
 
+    type User {
+      _id: ID!
+      firstName: String!
+      lastName: String!
+      email: String
+      password: String
+    }
+
     input NotebookInput {
       name: String!
       createdAt: String!
     }
 
+    input UserInput {
+      firstName: String!
+      lastName: String!
+      email: String!
+      password: String!
+    }
+
     type RootQuery {
-      notebookList: [Notebook!]!
+      notebooks: [Notebook!]!
     }
 
     type RootMutation {
       createNotebook(notebookInput: NotebookInput): Notebook
+      createUser(userInput: UserInput): User
     }
 
     schema {
@@ -38,7 +57,7 @@ app.use(
     }
   `),
     rootValue: {
-      notebookList: async () => {
+      notebooks: async () => {
         // called when someone looks for notebooks
         const res = await Notebook.find();
 
@@ -57,6 +76,9 @@ app.use(
         const res = await notebook.save();
 
         return { ...res._doc };
+      },
+      createUser: async args => {
+
       }
     },
     graphiql: true // provides an interface
