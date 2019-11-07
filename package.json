@@ -1,0 +1,30 @@
+{
+  "name": "Notable",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "server": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IsaacAderogba/Notable.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IsaacAderogba/Notable/issues"
+  },
+  "homepage": "https://github.com/IsaacAderogba/Notable#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-graphql": "^0.9.0",
+    "graphql": "^14.5.8"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.4"
+  }
+}
