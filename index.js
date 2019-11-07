@@ -1,13 +1,12 @@
+require("dotenv").config();
 const express = require("express");
 const graphqlHttp = require("express-graphql");
+const mongoose = require("mongoose");
 const { buildSchema } = require("graphql"); // takes template literal
+const Notebook = require("./models/notebook");
 
 const app = express();
 app.use(express.json());
-
-const notebookList = [
-  { _id: 1, name: "SQL", createdAt: "2019-11-07T18:55:46.746Z" }
-];
 
 // use graphqlHttp to build schema and root queries/mutations
 app.use(
@@ -39,26 +38,38 @@ app.use(
     }
   `),
     rootValue: {
-      notebookList: () => {
+      notebookList: async () => {
         // called when someone looks for notebooks
-        return notebookList;
+        const res = await Notebook.find();
+
+        return res.map(nbList => {
+          return { ...nbList._doc };
+        });
       },
-      createNotebook: args => {
+      createNotebook: async args => {
         const { name, createdAt } = args.notebookInput;
 
-        const notebook = {
-          _id: Math.random().toString(),
+        // create notebook using Notebook constructor, and then write data to db
+        const notebook = new Notebook({
           name,
-          createdAt
-        };
+          createdAt: new Date(createdAt)
+        });
+        const res = await notebook.save();
 
-        notebookList.push(notebook);
-
-        return notebook;
+        return { ...res._doc };
       }
     },
     graphiql: true // provides an interface
   })
 );
 
-app.listen(5000);
+mongoose
+  .connect(
+    `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PW}@cluster0-eo2ax.mongodb.net/${process.env.MONGODB}?retryWrites=true&w=majority`,
+    { useNewUrlParser: true, useUnifiedTopology: true }
+  )
+  .then(() => {
+    console.log("Connected to MongoDB Atlas");
+    app.listen(5000);
+  })
+  .catch(err => console.log("Error: ", err.message));
