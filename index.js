@@ -2,11 +2,11 @@ require("dotenv").config();
 const express = require("express");
 const graphqlHttp = require("express-graphql");
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 const { buildSchema } = require("graphql"); // takes template literal
 
-
 const Notebook = require("./models/notebook");
-const User = require("./models/user")
+const User = require("./models/user");
 
 const app = express();
 app.use(express.json());
@@ -73,12 +73,23 @@ app.use(
           name,
           createdAt: new Date(createdAt)
         });
-        const res = await notebook.save();
 
+        const res = await notebook.save();
         return { ...res._doc };
       },
       createUser: async args => {
+        const { firstName, lastName, email, password } = args.userInput;
 
+        const hashedPW = bcrypt.hashSync(password, 12);
+        const user = new User({
+          firstName,
+          lastName,
+          email,
+          password: hashedPW
+        });
+
+        const res = await user.save();
+        return { ...res._doc };
       }
     },
     graphiql: true // provides an interface
