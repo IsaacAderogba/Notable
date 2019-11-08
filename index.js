@@ -68,14 +68,25 @@ app.use(
       createNotebook: async args => {
         const { name, createdAt } = args.notebookInput;
 
+        // validate that user exists
+        const foundUser = await User.findById("5dc52a2dbbe3a50766317ce7");
+        if (!foundUser) throw new Error("User does not exist");
+
         // create notebook using Notebook constructor, and then write data to db
         const notebook = new Notebook({
           name,
-          createdAt: new Date(createdAt)
+          createdAt: new Date(createdAt),
+          owner: "5dc52a2dbbe3a50766317ce7",
+          authors: ["5dc52a2dbbe3a50766317ce7"]
         });
+        const savedNotebook = await notebook.save();
 
-        const res = await notebook.save();
-        return { ...res._doc };
+        // For each user in authors, add to notebook list
+        await foundUser.notebooks.push(notebook);
+        await foundUser.save()
+
+        // return savedNotebook
+        return { ...savedNotebook._doc };
       },
       createUser: async args => {
         const { firstName, lastName, email, password } = args.userInput;

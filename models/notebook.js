@@ -11,6 +11,11 @@ const notebookSchema = new Schema({
     type: Date, // up to us to convert
     required: true
   },
+  owner: {
+    type: Schema.Types.ObjectId, 
+    ref: "User",
+    required: true
+  },
   authors: [
     {
       type: Schema.Types.ObjectId, // stores list of ids
