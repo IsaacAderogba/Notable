@@ -80,6 +80,9 @@ app.use(
       createUser: async args => {
         const { firstName, lastName, email, password } = args.userInput;
 
+        const fndUser = await User.findOne({ email });
+        if (fndUser) throw new Error("User with this email already exists");
+
         const hashedPW = bcrypt.hashSync(password, 12);
         const user = new User({
           firstName,
@@ -89,7 +92,7 @@ app.use(
         });
 
         const res = await user.save();
-        return { ...res._doc };
+        return { ...res._doc, password: null };
       }
     },
     graphiql: true // provides an interface
